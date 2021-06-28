@@ -15,7 +15,7 @@ namespace BlackJackJs{
             Utils.Printf("->"); 
             string name = Utils.GetInput();
             Auth.Login(name);
-            Utils.Print("Logado como:" + Auth.CurrentUser.Name);
+            Utils.Print("Logado como: " + Auth.CurrentUser.Name);
             ShowMenu();
         }
         public static void ShowMenu(){
@@ -50,10 +50,13 @@ namespace BlackJackJs{
                 case MenuActions.Deslogar:
                     break;
                 case MenuActions.Sair:
-                    break;
+                    return;
                 default:
                     break;
             }
+            Utils.Printf("Pressione qualquer tecla para continuar");
+            Console.ReadKey();
+            ShowMenu();
         }
         public static int ShowProfileActions(){
             Utils.Print();
@@ -75,11 +78,13 @@ namespace BlackJackJs{
                     ShowProfile(Auth.CurrentUser.Name);
                     break;
                 case ProfileActions.VerOutroPerfil:
+                    Utils.Printf("Qual usuário você quer procurar?\n->");
                     ShowProfile(Utils.GetInput());
                     break;
-                case ProfileActions.DeletarSuaConta:
-                    break;
                 case ProfileActions.AdicionarAmigo:
+                    Utils.Print("Não implementado ainda!");
+                    break;
+                case ProfileActions.DeletarSuaConta:
                     break;
                 case ProfileActions.VerAmigos:
                     break;
@@ -93,8 +98,10 @@ namespace BlackJackJs{
                     
                     break;
                 default:
+                    Utils.Print("Erro interno\nUtils.cs\nRouteProfileAction()\nswitch(choice)");
                     break;
             }
+
         }
         
         public static void ShowProfile(string username){

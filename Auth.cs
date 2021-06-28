@@ -52,7 +52,7 @@ namespace BlackJackJs{
                 CurrentUser.Name = CurrentUser.Name;
                 save.usuarios.Add(CurrentUser);
             }
-            File.WriteAllText(apppath,JsonConvert.SerializeObject(save));
+            File.WriteAllText(apppath,JsonConvert.SerializeObject(save,Formatting.Indented));
         }
         public static bool CheckFiles(){
             if(!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)+@"\Rodrigo's_Stuff\BlackJackCMD\")){
