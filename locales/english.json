@@ -1,0 +1,6 @@
+{
+    "WelcomeMessage": " Welcome to BlackJaC# ",
+    "TypeUser":"Type your username: \n(If it doesn't exists, one will be created for you!)",
+    "LoggedIn":"Logged in as: ",
+    "UserDoesntExists":"Usuário não existente, criando "
+}

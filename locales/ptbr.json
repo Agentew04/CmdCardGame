@@ -1,0 +1,7 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "WelcomeMessage": "Bem-vindo ao BlackJaC#",
+    "TypeUser":"Digite o seu nome de usuário: \n(Se não existe, um será criado para você!)",
+    "LoggedIn":"Logado como: ",
+    "UserDoesntExists":"Usuário não existente, criando "
+}

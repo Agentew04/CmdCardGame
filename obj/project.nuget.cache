@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "xQ0W5ibEZewikxJK1uoRgYRiPN9arWboa+x8tWRq2jUdHNWITMmDpl0yJD6/mypya04LF6RpQvqgAO9wHLxK5A==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\digoa\\Desktop\\Arquivos\\projetos\\BlackJackJs\\BlackJackJs.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\digoa\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
