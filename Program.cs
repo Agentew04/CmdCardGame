@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace BlackJackJs
 {
@@ -14,6 +15,9 @@ namespace BlackJackJs
 
         static void Main(string[] args)
         {
+            Utils.Print(Utils.CardString.GenStr(new int[]{1,2},new Naipe[]{Naipe.Espadas,Naipe.Copas},2));
+            return;
+
             Auth.Load();
             Baralho = new Baralho();
             Player = new Pilha();

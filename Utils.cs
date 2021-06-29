@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using BlackJackJs;
 
 namespace BlackJackJs{
@@ -175,6 +176,8 @@ namespace BlackJackJs{
             HighScoreSorting choice = (HighScoreSorting)(i-1);
             var users = Auth.GetUsers();
             List<User> top10 = new();
+            Collection<User> col = new Collection<User>(users);
+            //var ordered = col.
         }
     }
 
@@ -275,6 +278,70 @@ namespace BlackJackJs{
                 isAcquired=!isAcquired;
             }
             return result;
+        }
+    
+        public static class CardString{
+            private static string getnaipe(Naipe np){
+                switch(np){
+                    case Naipe.Espadas:
+                        return "# Espadas #";
+                    case Naipe.Copas:
+                        return "#  Copas  #";
+                    case Naipe.Ouros:
+                        return "#  Ouros  #";
+                    case Naipe.Paus:
+                        return "#  Paus   #";
+                    default:
+                        return "###########\n";
+                }
+            }
+            private static string[] getcard(int nm,Naipe np){
+                if(nm<10){
+                    string[] x = {"###########",
+                    $"#{nm}        #",
+                    "#         #",
+                    getnaipe(np),
+                    "#         #",
+                    $"#        {nm}#",
+                    "###########"};
+                    return x;
+                }else{
+                    string[] x = {
+                        "###########\n",
+                        $"#{nm}       #\n",
+                        "#         #\n",
+                        getnaipe(np),
+                        "#         #\n",
+                        $"#       {nm}#\n",
+                        "###########\n"
+                    };
+                    return x;
+                }
+            }
+            public static string GenStr(int[] nm,Naipe[] np, int count=1){
+                if(nm.Length != count && np.Length !=count){
+                    return "??";
+                }
+                List<string> x = new List<string>(){
+                    "","","","","","",""
+                };
+                for(var i=0;i<count;i++){
+                    var y = getcard(nm[i],np[i]);
+                    x[0] += "  "+y[0];
+                    x[1] += "  "+y[1];
+                    x[2] += "  "+y[2];
+                    x[3] += "  "+y[3];
+                    x[4] += "  "+y[4];
+                    x[5] += "  "+y[5];
+                    x[6] += "  "+y[6];
+                }
+                string w ="";
+                foreach(var z in x){
+                    w += z + "\n";
+                }
+                return w;
+
+            }
         }
     }
 
