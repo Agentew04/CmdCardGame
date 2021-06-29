@@ -15,14 +15,16 @@ namespace BlackJackJs
 
         static void Main(string[] args)
         {
-            Utils.Print(Utils.CardString.GenStr(new int[]{1,2},new Naipe[]{Naipe.Espadas,Naipe.Copas},2));
-            return;
 
             Auth.Load();
             Baralho = new Baralho();
             Player = new Pilha();
             Dealer = new Pilha();
+            Player.addCard(new Card(5,Naipe.Ouros));
+            Player.addCard(new Card(13,Naipe.Paus));
 
+            Player.RenderCards();
+            return;
             Menu.StartEngine();
                         
             Auth.Save();

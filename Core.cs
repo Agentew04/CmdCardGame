@@ -25,12 +25,29 @@ namespace BlackJackJs{
         BlackJackClassic
     }
     public class Pilha{
+        /// <summary>
+        /// A List of all the cards the deck has
+        /// </summary>
+        /// <value></value>
         public List<Card> Cartas {get;set;}
         public Pilha(){
             this.Cartas = new List<Card>();
         }
         public Pilha(List<Card> cartas){
             this.Cartas = cartas;
+        }
+        public Pilha(Card[] cartas){
+            this.Cartas = new(cartas);
+        }
+        /// <summary>
+        /// The amount of cards the deck has
+        /// </summary>
+        /// <value></value>
+        public int Count {
+            get {
+                return Cartas.Count;
+            }
+            private set {}
         }
         public void addCard(Card carta){
             this.Cartas.Add(carta);
@@ -39,6 +56,15 @@ namespace BlackJackJs{
             foreach(Card carta in this.Cartas){
                 Console.WriteLine($">>{carta.ToString()}");
             }
+        }
+        public void RenderCards(){
+            List<int> tempnmlist = new();
+            List<Naipe> tempnplist = new();
+            foreach(var card in Cartas){
+                tempnmlist.Add(card.Numero);
+                tempnplist.Add(card.Naipe);
+            }
+            Utils.Printf(Utils.GenStr(tempnmlist.ToArray(),tempnplist.ToArray(),Cartas.Count));
         }
         public int CountCards(Regras rules = Regras.BlackJackClassic){
             int count=0;
@@ -60,24 +86,8 @@ namespace BlackJackJs{
             this.Cartas = new List<Card>();
         }
     }
-    public class Baralho{
-        /// <summary>
-        /// A List of all the cards the deck has
-        /// </summary>
-        /// <value></value>
-        public List<Card> Cartas {get;set;}
+    public class Baralho : Pilha{
         private Random rng {get;}
-
-        /// <summary>
-        /// The amount of cards the deck has
-        /// </summary>
-        /// <value></value>
-        public int Count {
-            get {
-                return Cartas.Count;
-            }
-            private set {}
-        }
 
         /// <summary>
         /// Creates a new instance of a card deck
@@ -85,12 +95,19 @@ namespace BlackJackJs{
         public Baralho(){
             this.rng = new Random();
             this.Cartas = new();
+            ResetBaralho();
+        }
+
+        /// <summary>
+        /// Set all cards and shuffles
+        /// </summary>
+        public void ResetBaralho(){
             for(int i =0; i<13;i++){
                 for(int j=0; j<4; j++){
                     this.Cartas.Add(new Card(i+1,(Naipe)j));
                 }
             }
-            this.Shuffle();
+            Shuffle();
         }
         /// <summary>
         /// Shuffle the current deck of cards
