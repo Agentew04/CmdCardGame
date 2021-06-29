@@ -1,13 +1,11 @@
 using System;
 using System.IO;
-using System.Security;
 using System.Security.Cryptography;
-using System.Runtime.InteropServices;
 using System.Text;
 
 
 namespace BlackJackJs{
-class Class1
+class Crypto
    {
       //  Call this function to remove the key from memory after use for security
       [System.Runtime.InteropServices.DllImport("KERNEL32.DLL", EntryPoint="RtlZeroMemory")]

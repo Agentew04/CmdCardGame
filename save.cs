@@ -42,6 +42,8 @@ namespace BlackJackJs{
             this.PartidasPerdidas = partidasPerdidas;
             this.PartidasEmpatadas = partidasEmpatadas;
             this.PartidasGanhas = partidasGanhas;  
+            this.Friends = new List<string>();
+            this.Mail = new List<Message>();
         }
 
         /// <summary>
@@ -67,7 +69,6 @@ namespace BlackJackJs{
         /// </summary>
         /// <value></value>
         public int TokensWon { get; set; } = 0;
-        
         public int Experience { get; set;} = 0;
         public int Level { get; set; } = 1;
         public Patente Patente {get;set;} = Patente.Unranked;
@@ -76,8 +77,49 @@ namespace BlackJackJs{
         public int PartidasPerdidas{get;set;} = 0;
         public int PartidasEmpatadas{get;set;}=0;
         public int PartidasGanhas{get;set;}=0;
-
         public List<string> Friends { get; set;} = new();
+        public List<Message> Mail {get;set;} = new();
 
+        public bool ReceiveMail(Message msg){
+            if(msg.ToUser == this.Name && msg.Content != null){
+                this.Mail.Add(msg);
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        public bool SendMail(string toUser, string message){
+            Message msg = new Message(toUser,message);
+            var users = Auth.GetUsers();
+            foreach(var user in users){
+                if(user.Name == msg.ToUser){
+                    return user.ReceiveMail(msg);
+                }else{
+                    continue;
+                }
+            }
+            return false;
+        }
+        public bool ReadMail(Guid msgId){
+            foreach(var msg in this.Mail){
+                if(msg.MessageId == msgId){
+                    msg.WasRead=true;
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool AddFriend(string username){
+            this.Friends.Add(username);
+            var users = Auth.GetUsers();
+            foreach(var user in users){
+                if(user.Name == username){
+                    user.Friends.Add(this.Name);
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

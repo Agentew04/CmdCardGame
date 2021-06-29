@@ -151,6 +151,17 @@ namespace BlackJackJs{
         ResetarProgresso,
         VoltarMenu
     }
+    public enum HighScoreSorting{
+        Level,
+        Tokens,
+        TokensWon,
+        TokensLost,
+        Patente,
+        MatchesWon,
+        MatchesPlayed,
+        MatchesLost,
+        BlackJacks
+    }
     public static class Actions{
         private static IDictionary<GameActions,string> _GameActions = new Dictionary<GameActions,string>(){
             {GameActions.Comprar,"Comprar"},
@@ -184,6 +195,32 @@ namespace BlackJackJs{
         };
         public static ReadOnlyDictionary<ProfileActions, string> ProfileActionsDict { get; } = new ReadOnlyDictionary<ProfileActions, string>(_ProfileActions);
 
+        private static IDictionary<HighScoreSorting,string> _HighScoreSorting = new Dictionary<HighScoreSorting,string>(){
+            {HighScoreSorting.BlackJacks,"Sortear por número de BlackJacks"},
+            {HighScoreSorting.Level,"Sortear pelo nível de experiência"},
+            {HighScoreSorting.MatchesLost,"Sortear pelo número de partidas perdidas"},
+            {HighScoreSorting.MatchesPlayed,"Sortear pelo número de partidas jogadas"},
+            {HighScoreSorting.MatchesWon,"Sortear pelo número de partidas ganhas"},
+            {HighScoreSorting.Patente,"Sortear pela patente competitiva"},
+            {HighScoreSorting.Tokens,"Sortear pelo número de Tokens"},
+            {HighScoreSorting.TokensLost,"Sortear pelo número de Tokens perdidos"},
+            {HighScoreSorting.TokensWon,"Sortear pelo número de Tokens lucrados"}
+        };
+        public static ReadOnlyDictionary<HighScoreSorting, string> HighScoreSortingDict { get; } = new ReadOnlyDictionary<HighScoreSorting, string>(_HighScoreSorting);
+
+    }
+    public class Message{
+
+        public Message(string toUser, string content){
+            this.ToUser = toUser;
+            this.Content = content;
+            this.WasRead = false;
+            this.MessageId = Guid.NewGuid();
+        }
+        public bool WasRead { get; set;}
+        public string ToUser {get;}
+        public string Content {get;}
+        public Guid MessageId {get;}
     }
 }   
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BlackJackJs;
 
 namespace BlackJackJs{
@@ -33,6 +34,18 @@ namespace BlackJackJs{
             int choice = Utils.GetIntInput(maxchoice);
             return choice;
         }
+        public static int ShowHighScoreOptions(){
+            Utils.Print();
+            Utils.Print("O que você deseja fazer?");
+            int i = 1;
+            foreach(var act in Actions.HighScoreSortingDict){
+                Utils.Print($"{i}- {act.Value}");
+                i++;
+            }
+            int maxchoice = i-1;
+            int choice = Utils.GetIntInput(maxchoice);
+            return choice;
+        }
         public static void RouteMenuAction(int numberchoice){
             MenuActions choice = (MenuActions)(numberchoice-1);
             switch (choice)
@@ -44,6 +57,7 @@ namespace BlackJackJs{
                     RouteProfileAction(ShowProfileActions());
                     break;
                 case MenuActions.VerHighscores:
+                    ShowHighScores(ShowHighScoreOptions());
                     break;
                 case MenuActions.ConseguirMaisTokens:
                     break;
@@ -54,8 +68,7 @@ namespace BlackJackJs{
                 default:
                     break;
             }
-            Utils.Printf("Pressione qualquer tecla para continuar");
-            Console.ReadKey();
+            Utils.Standby();
             ShowMenu();
         }
         public static int ShowProfileActions(){
@@ -101,9 +114,9 @@ namespace BlackJackJs{
                     Utils.Print("Erro interno\nUtils.cs\nRouteProfileAction()\nswitch(choice)");
                     break;
             }
-
+            //nao precisa chamar o menu aqui pq volta pro RouteMenuAction
         }
-        
+
         public static void ShowProfile(string username){
             float getkd(User us){
                 if(us.PartidasJogadas==0){
@@ -157,6 +170,12 @@ namespace BlackJackJs{
                 Utils.Print($"-=-=-=-=-=-=-=-=-=-");
             }
         }
+    
+        public static void ShowHighScores(int i){
+            HighScoreSorting choice = (HighScoreSorting)(i-1);
+            var users = Auth.GetUsers();
+            List<User> top10 = new();
+        }
     }
 
     public static class Utils {
@@ -165,6 +184,10 @@ namespace BlackJackJs{
         }
         public static void Printf(string s = ""){
             Console.Write(s);
+        }
+        public static void Standby(){
+            Utils.Printf("Pressione qualquer tecla para continuar");
+            Console.ReadKey();
         }
         /// <summary>
         /// Gets and sanitizes a string input
@@ -254,4 +277,5 @@ namespace BlackJackJs{
             return result;
         }
     }
+
 }
