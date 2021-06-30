@@ -52,19 +52,25 @@ namespace BlackJackJs{
         public void addCard(Card carta){
             this.Cartas.Add(carta);
         }
-        public void OutputCards(){
-            foreach(Card carta in this.Cartas){
-                Console.WriteLine($">>{carta.ToString()}");
+        public void RenderCards(bool hideone=false){
+            if(!hideone){
+                List<int> tempnmlist = new();
+                List<Naipe> tempnplist = new();
+                foreach(var card in Cartas){
+                    tempnmlist.Add(card.Numero);
+                    tempnplist.Add(card.Naipe);
+                }
+                Utils.Printf(Utils.GenStr(tempnmlist.ToArray(),tempnplist.ToArray(),Cartas.Count));
+            }else{
+                List<int> tempnmlist = new();
+                List<Naipe> tempnplist = new();
+                foreach(var card in Cartas){
+                    tempnmlist.Add(card.Numero);
+                    tempnplist.Add(card.Naipe);
+                }
+                Utils.Printf(Utils.GenStr(tempnmlist.ToArray(),tempnplist.ToArray(),Cartas.Count,true));
             }
-        }
-        public void RenderCards(){
-            List<int> tempnmlist = new();
-            List<Naipe> tempnplist = new();
-            foreach(var card in Cartas){
-                tempnmlist.Add(card.Numero);
-                tempnplist.Add(card.Naipe);
-            }
-            Utils.Printf(Utils.GenStr(tempnmlist.ToArray(),tempnplist.ToArray(),Cartas.Count));
+            
         }
         public int CountCards(Regras rules = Regras.BlackJackClassic){
             int count=0;
@@ -190,7 +196,7 @@ namespace BlackJackJs{
         public static ReadOnlyDictionary<GameActions, string> GameActionsDict { get; } = new ReadOnlyDictionary<GameActions, string>(_GameActions);
 
         private static IDictionary<MenuActions,string> _MenuActions = new Dictionary<MenuActions,string>(){
-            {MenuActions.Jogar,"Jogar"},
+            {MenuActions.Jogar,"Jogar (Paga 2:3)"},
             {MenuActions.VerPerfil,"ver o seu perfil ou de outro jogador"},
             {MenuActions.VerHighscores,"Ver o placar de líderes"},
             {MenuActions.ConseguirMaisTokens,"Consiga mais Tokens"},

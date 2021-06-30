@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using BlackJackJs;
 
 namespace BlackJackJs{
     public static class Menu{
@@ -52,7 +51,7 @@ namespace BlackJackJs{
             switch (choice)
             {
                 case MenuActions.Jogar:
-                    Program.PlayGame();
+                    Game.PlayGame();
                     break;
                 case MenuActions.VerPerfil:
                     RouteProfileAction(ShowProfileActions());
@@ -63,6 +62,7 @@ namespace BlackJackJs{
                 case MenuActions.ConseguirMaisTokens:
                     break;
                 case MenuActions.Deslogar:
+                    Menu.StartEngine();
                     break;
                 case MenuActions.Sair:
                     return;
@@ -179,6 +179,18 @@ namespace BlackJackJs{
             Collection<User> col = new Collection<User>(users);
             //var ordered = col.
         }
+        public static GameActions ShowGameActions(){
+            Utils.Print();
+            Utils.Print("O que você deseja fazer?");
+            int i = 1;
+            foreach(var act in Actions.GameActionsDict){
+                Utils.Print($"{i}- {act.Value}");
+                i++;
+            }
+            int choice = Utils.GetIntInput(i-1);
+
+            return (GameActions)(choice-1);
+        }
     }
 
     public static class Utils {
@@ -190,6 +202,10 @@ namespace BlackJackJs{
         }
         public static void Standby(){
             Utils.Printf("Pressione qualquer tecla para continuar");
+            Console.ReadKey();
+        }
+        public static void Standby(string message){
+            Utils.Printf(message);
             Console.ReadKey();
         }
         /// <summary>
@@ -240,7 +256,7 @@ namespace BlackJackJs{
                 if(result == 0){
                     continue;
                 }
-                result = Math.Abs(result);
+                result = (int)Math.Abs((long)result);
 
                 isAcquired=!isAcquired;
             }
@@ -270,7 +286,7 @@ namespace BlackJackJs{
                 {
                     continue;
                 }
-                result = Math.Abs(result);
+                result = (int)Math.Abs((long)result);
                 if(result == 0 || result>maximum){
                     continue;
                 }
@@ -280,8 +296,9 @@ namespace BlackJackJs{
             return result;
         }
     
-        private static string getnaipe(Naipe np){
-            switch(np){
+        private static string getnaipe(Naipe np,bool hideone=false){
+            if(!hideone){
+                switch(np){
                 case Naipe.Espadas:
                     return "# Espadas #";
                 case Naipe.Copas:
@@ -292,30 +309,48 @@ namespace BlackJackJs{
                     return "#  Paus   #";
                 default:
                     return "###########";
-            }
-        }
-        private static string[] getcard(int nm,Naipe np){
-            if(nm<10){
-                string[] x = {"###########",
-                $"#{nm}        #",
-                "#         #",
-                getnaipe(np),
-                "#         #",
-                $"#        {nm}#",
-                "###########"};
-                return x;
+                }
             }else{
-                string[] x = {
-                    "###########",
-                    $"#{nm}       #",
+                return "#   ???   #";
+            }
+            
+        }
+        private static string[] getcard(int nm,Naipe np,bool hideone=false){
+            if(!hideone){
+                if(nm<10){
+                    string[] x = {"###########",
+                    $"#{nm}        #",
                     "#         #",
                     getnaipe(np),
                     "#         #",
-                    $"#       {nm}#",
-                    "###########"
-                };
+                    $"#        {nm}#",
+                    "###########"};
+                    return x;
+                }else{
+                    string[] x = {
+                        "###########",
+                        $"#{nm}       #",
+                        "#         #",
+                        getnaipe(np),
+                        "#         #",
+                        $"#       {nm}#",
+                        "###########"
+                    };
+                    return x;
+                }
+            }else{
+                string[] x = {
+                        "###########",
+                        "#?        #",
+                        "#         #",
+                        getnaipe(np,hideone),
+                        "#         #",
+                        "#        ?#",
+                        "###########"
+                    };
                 return x;
             }
+            
         }
         public static string GenStr(int[] nm,Naipe[] np, int count=1){
             if(nm.Length != count && np.Length !=count){
@@ -342,6 +377,44 @@ namespace BlackJackJs{
 
         }
         
+        public static string GenStr(int[] nm,Naipe[] np, int count=1,bool hideone=false){
+            if(!hideone){
+                return GenStr(nm,np,count);
+            }else{
+                if(nm.Length != count && np.Length !=count){
+                    return "??";
+                }
+                List<string> x = new List<string>(){
+                    "","","","","","",""
+                };
+                for(var i=0;i<count;i++){
+                    if(i==0){
+                        var y = getcard(nm[i],np[i],hideone);
+                        x[0] += "  "+y[0];
+                        x[1] += "  "+y[1];
+                        x[2] += "  "+y[2];
+                        x[3] += "  "+y[3];
+                        x[4] += "  "+y[4];
+                        x[5] += "  "+y[5];
+                        x[6] += "  "+y[6];
+                    }else{
+                        var y = getcard(nm[i],np[i]);
+                        x[0] += "  "+y[0];
+                        x[1] += "  "+y[1];
+                        x[2] += "  "+y[2];
+                        x[3] += "  "+y[3];
+                        x[4] += "  "+y[4];
+                        x[5] += "  "+y[5];
+                        x[6] += "  "+y[6];
+                    }
+                }
+                string w ="";
+                foreach(var z in x){
+                    w += z + "\n";
+                }
+                return w;
+            }
+        }
     }
 
 }
