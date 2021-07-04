@@ -6,7 +6,7 @@ namespace BlackJackJs{
     public static class Menu{
         public static void StartEngine(){
             Utils.Print("####################################");
-            Utils.Print("#      Bem-vindo ao BlackJac#      #");
+            Utils.Print("#      Bem-vindo ao BlackJaC#      #");
             Utils.Print("#                                  #");
             Utils.Print("#            V0.2 -Beta            #");
             Utils.Print("####################################");
@@ -16,7 +16,7 @@ namespace BlackJackJs{
             Utils.Printf("->"); 
             string name = Utils.GetInput();
             Auth.Login(name);
-            Utils.Print("Logado como: " + Auth.CurrentUser.Name);
+            Utils.Print("Logado como: " + Auth.Username);
             ShowMenu();
         }
         public static void ShowMenu(){
@@ -89,7 +89,7 @@ namespace BlackJackJs{
             switch (choice)
             {
                 case ProfileActions.VerSeuPerfil:
-                    ShowProfile(Auth.CurrentUser.Name);
+                    ShowProfile(Auth.Username);
                     break;
                 case ProfileActions.VerOutroPerfil:
                     Utils.Printf("Qual usuário você quer procurar?\n->");
@@ -126,10 +126,10 @@ namespace BlackJackJs{
                     return ((float)us.PartidasGanhas)/((float)us.PartidasJogadas);
                 }
             }
-            if(username == Auth.CurrentUser.Name){
+            if(username == Auth.Username){
                 //himself
 
-                var user = Auth.CurrentUser;
+                var user = Saving.GetUser(username);
                 Utils.Print($"Mostrando o perfil de {user.Name}");
                 Utils.Print($"-=-=-=-=-=-=-=-=-=-");
                 Utils.Print($"Nível: {user.Level}");
@@ -151,7 +151,7 @@ namespace BlackJackJs{
             }else{
                 //other
                 
-                var user = Auth.GetUser(username);
+                var user = Saving.GetUser(username);
                 Utils.Print($"Mostrando o perfil de {user.Name}");
                 Utils.Print($"-=-=-=-=-=-=-=-=-=-");
                 Utils.Print($"Nível: {user.Level}");
@@ -174,7 +174,7 @@ namespace BlackJackJs{
     
         public static void ShowHighScores(int i){
             HighScoreSorting choice = (HighScoreSorting)(i-1);
-            var users = Auth.GetUsers();
+            var users = Saving.GetUsers();
             List<User> top10 = new();
             Collection<User> col = new Collection<User>(users);
             //var ordered = col.
@@ -196,6 +196,9 @@ namespace BlackJackJs{
     public static class Utils {
         public static void Print(string s = "\n"){
             Console.WriteLine(s);
+        }
+        public static void Print(object o){
+            Console.WriteLine(o.ToString());
         }
         public static void Printf(string s = ""){
             Console.Write(s);
@@ -329,7 +332,7 @@ namespace BlackJackJs{
                 }else{
                     string[] x = {
                         "###########",
-                        $"#{nm}       #",
+                       $"#{nm}       #",
                         "#         #",
                         getnaipe(np),
                         "#         #",

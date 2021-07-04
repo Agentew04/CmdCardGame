@@ -27,15 +27,18 @@ namespace BlackJackJs{
             return false;
         }
         public static int CalculateProfit(int bet){
-            return (int)Math.Round((double)(2*(bet/3)));
+            return (int)Math.Floor(2d*((double)bet/3d));
         }
 
         public static void PlayGame(){
+            User CurrentUser = Saving.GetUser(Auth.Username);
+
             ResetGame();
-            Auth.CurrentUser.PartidasJogadas++;
+            CurrentUser.PartidasJogadas++;
+
             //set bets
             Utils.Print("Digite a sua aposta!");
-            int bet = Utils.GetIntInput(Auth.CurrentUser.Tokens);
+            int bet = Utils.GetIntInput(CurrentUser.Tokens);
             Utils.Print("Distribuindo as cartas!\n\n");
             Dealer.addCard(Baralho.GetCard());
             Player.addCard(Baralho.GetCard());
@@ -54,10 +57,10 @@ namespace BlackJackJs{
                 Utils.Print("Você tem um BlackJack! Você venceu!");
                 var profit = CalculateProfit(bet);
                 Utils.Print($"+{profit} Tokens");
-                Auth.CurrentUser.Tokens+=profit;
-                Auth.CurrentUser.TokensWon+=profit;
-                Auth.CurrentUser.Blackjacks++;
-                Auth.CurrentUser.PartidasGanhas++;
+                CurrentUser.Tokens+=profit;
+                CurrentUser.TokensWon+=profit;
+                CurrentUser.Blackjacks++;
+                CurrentUser.PartidasGanhas++;
                 return;
             }
 
@@ -77,15 +80,17 @@ namespace BlackJackJs{
                         }
                         else if(Player.CountCards() == 21){
                             Utils.Print("Você tem um BlackJack! Você venceu!");
-                            Utils.Print($"+{bet/2} Tokens");
-                            Auth.CurrentUser.Tokens+=bet/2;
-                            Auth.CurrentUser.Blackjacks++;
-                            Auth.CurrentUser.PartidasGanhas++;
+                            var profit = CalculateProfit(bet);
+                            Utils.Print($"+{profit} Tokens");
+                            CurrentUser.Tokens+=profit;
+                            CurrentUser.TokensWon+=profit;
+                            CurrentUser.Blackjacks++;
+                            CurrentUser.PartidasGanhas++;
                             return;
                         }
                         break;
                     case GameActions.Dobrar:
-                        if(!(Auth.CurrentUser.Tokens >= bet*2)){
+                        if(!(CurrentUser.Tokens >= bet*2)){
                             Utils.Print("Você não tem tokens o suficiente para dobrar");
                             continue;
                         }
@@ -100,10 +105,10 @@ namespace BlackJackJs{
                             Utils.Print("Você tem um BlackJack! Você venceu!");
                             var profit = CalculateProfit(bet);
                             Utils.Print($"+{profit} Tokens");
-                            Auth.CurrentUser.Tokens+=profit;
-                            Auth.CurrentUser.TokensWon+=profit;
-                            Auth.CurrentUser.Blackjacks++;
-                            Auth.CurrentUser.PartidasGanhas++;
+                            CurrentUser.Tokens+=profit;
+                            CurrentUser.TokensWon+=profit;
+                            CurrentUser.Blackjacks++;
+                            CurrentUser.PartidasGanhas++;
                             return;
                         }
                         break;
@@ -117,8 +122,8 @@ namespace BlackJackJs{
             Utils.Print("Cartas da casa: ");
             Dealer.RenderCards();
             Utils.Print($"A casa tem {Dealer.CountCards()}");
-            Utils.Print("A casa vai começar a comprar agora");
-            Utils.Standby("Continue...");
+            Utils.Print("A casa vai começar a comprar agora.");
+            Utils.Standby("aperque qualquer botão para iniciar a compra...");
             while(Dealer.CountCards() < 17){
                 Card dbuycard = Baralho.GetCard();
                 Dealer.addCard(dbuycard);
@@ -129,32 +134,45 @@ namespace BlackJackJs{
 
             //check results
             if(EvalBust(Dealer)){
-                Utils.Print("A casa passou de 21, você ganhou!");
+                Utils.Print("A casa tem mais que 21, você ganhou!");
                 var profit = CalculateProfit(bet);
                 Utils.Print($"+{profit} Tokens");
-                Auth.CurrentUser.Tokens += profit;
-                Auth.CurrentUser.TokensWon += profit;
-                Auth.CurrentUser.PartidasGanhas++;
+
+                CurrentUser.Tokens += profit;
+                CurrentUser.TokensWon += profit;
+                CurrentUser.PartidasGanhas++;
+
             }else if(EvalBlackjack(Dealer)){
+                Utils.Print("A casa tem 21, ela ganhou!");
+                Utils.Print($"-{bet} Tokens");
+
+                CurrentUser.Tokens -= bet;
+                CurrentUser.TokensLost += bet;
+                CurrentUser.PartidasPerdidas++;
 
             }else if(Dealer.CountCards() > Player.CountCards()){
                 Utils.Print("A casa tem mais que você, perdeu!");
                 Utils.Print($"-{bet} Tokens");
-                Auth.CurrentUser.PartidasPerdidas++;
-                Auth.CurrentUser.Tokens -= bet;
+
+                CurrentUser.Tokens -= bet;
+                CurrentUser.TokensLost += bet;
+                CurrentUser.PartidasPerdidas++;
+
             }else if(Dealer.CountCards() < Player.CountCards() && Player.CountCards() <=21){
                 Utils.Print("Você tem mais que a casa, ganhou!");
-                //ganhar tokens
-                Auth.CurrentUser.Tokens += (int)Math.Round(bet*1.5);
-                Utils.Print($"+{(int)Math.Round(bet*1.5)} Tokens");
-                Auth.CurrentUser.PartidasGanhas++;
+                var profit = CalculateProfit(bet);
+                Utils.Print($"+{profit} Tokens");
+
+                CurrentUser.Tokens += profit;
+                CurrentUser.TokensWon += profit;
+                CurrentUser.PartidasGanhas++;
+
             }else if(Dealer.CountCards() == Player.CountCards()){
                 Utils.Print("Você tem a mesma quantidade que a casa, empate!");
-                //restituir
-                Auth.CurrentUser.PartidasEmpatadas++;
-                Auth.CurrentUser.Tokens += bet;
+
+                CurrentUser.PartidasEmpatadas++;
             }
-            return ;
+            Saving.Update(CurrentUser);
         }
     }
 }

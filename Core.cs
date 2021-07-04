@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace BlackJackJs{
     public class Card{
@@ -13,6 +14,10 @@ namespace BlackJackJs{
         public override string ToString(){
             return this.Numero + " de "+ Enum.GetName(typeof(Naipe),this.Naipe);
         }
+        public override int GetHashCode(){
+            return HashCode.Combine<int,Naipe>(Numero,Naipe);
+        }
+
         
     }
     public enum Naipe { 
@@ -22,7 +27,10 @@ namespace BlackJackJs{
         Copas
     }
     public enum Regras{
-        BlackJackClassic
+        BlackJackClassic,
+        Truco,
+        Poker,
+        Pife
     }
     public class Pilha{
         /// <summary>
@@ -30,15 +38,6 @@ namespace BlackJackJs{
         /// </summary>
         /// <value></value>
         public List<Card> Cartas {get;set;}
-        public Pilha(){
-            this.Cartas = new List<Card>();
-        }
-        public Pilha(List<Card> cartas){
-            this.Cartas = cartas;
-        }
-        public Pilha(Card[] cartas){
-            this.Cartas = new(cartas);
-        }
         /// <summary>
         /// The amount of cards the deck has
         /// </summary>
@@ -48,6 +47,15 @@ namespace BlackJackJs{
                 return Cartas.Count;
             }
             private set {}
+        }
+        public Pilha(){
+            this.Cartas = new List<Card>();
+        }
+        public Pilha(List<Card> cartas){
+            this.Cartas = cartas;
+        }
+        public Pilha(Card[] cartas){
+            this.Cartas = new(cartas);
         }
         public void addCard(Card carta){
             this.Cartas.Add(carta);
@@ -75,8 +83,23 @@ namespace BlackJackJs{
         public int CountCards(Regras rules = Regras.BlackJackClassic){
             int count=0;
             if(rules == Regras.BlackJackClassic){
-                foreach(Card card in this.Cartas){
-                    count+=card.Numero;
+                var hasHighValue = Cartas.AsQueryable()
+                .Any(c=>c.Numero>=11 && c.Numero<=13);
+                foreach(Card card in Cartas){
+                    if(card.Numero<=10 && card.Numero!=1){
+                        count+=card.Numero;
+                        continue;
+                    }else if(card.Numero>=11 && card.Numero<=13){
+                        count+=10;
+                        continue;
+                    }else if(card.Numero==1){
+                        if(hasHighValue){
+                            count+=11;
+                        }else{
+                            count+=1;
+                        }
+                        continue;
+                    }
                 }
             }
             return count;
@@ -120,10 +143,10 @@ namespace BlackJackJs{
         /// </summary>
         public void Shuffle(){
             for (double i = this.Cartas.Count - 1; i > 0; i--) {
-            double j = Math.Floor(rng.NextDouble() * (i + 1));
-            Card temp = this.Cartas[(int)i];
-            this.Cartas[(int)i] = this.Cartas[(int)j];
-            this.Cartas[(int)j] = temp;
+                double j = Math.Floor(rng.NextDouble() * (i + 1));
+                Card temp = this.Cartas[(int)i];
+                this.Cartas[(int)i] = this.Cartas[(int)j];
+                this.Cartas[(int)j] = temp;
             }
         }
         /// <summary>

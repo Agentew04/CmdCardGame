@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using LiteDB;
+using System.Linq;
 
 namespace BlackJackJs{
     public class SaveGameState{
@@ -45,6 +47,7 @@ namespace BlackJackJs{
             this.Friends = new List<string>();
             this.Mail = new List<Message>();
         }
+        #region properties
 
         /// <summary>
         /// The nickname of the player
@@ -79,7 +82,11 @@ namespace BlackJackJs{
         public int PartidasGanhas{get;set;}=0;
         public List<string> Friends { get; set;} = new();
         public List<Message> Mail {get;set;} = new();
+        public BsonValue _id {get;set;}
 
+        #endregion
+
+        #region social
         public bool ReceiveMail(Message msg){
             if(msg.ToUser == this.Name && msg.Content != null){
                 this.Mail.Add(msg);
@@ -91,35 +98,117 @@ namespace BlackJackJs{
 
         public bool SendMail(string toUser, string message){
             Message msg = new Message(toUser,message);
-            var users = Auth.GetUsers();
-            foreach(var user in users){
-                if(user.Name == msg.ToUser){
-                    return user.ReceiveMail(msg);
-                }else{
-                    continue;
-                }
+            var user = Saving.GetUser(toUser);
+            return user.ReceiveMail(msg);
+        }public bool SendMail(Message message){
+            if(!string.IsNullOrWhiteSpace(message.ToUser)
+                && message.Content != null
+                && message.Content != ""){
+                var user = Saving.GetUser(message.ToUser);
+                return user.ReceiveMail(message);
             }
             return false;
         }
         public bool ReadMail(Guid msgId){
-            foreach(var msg in this.Mail){
-                if(msg.MessageId == msgId){
-                    msg.WasRead=true;
+            var msg = this.Mail.AsQueryable()
+                .Where(msg => msg.MessageId == msgId)
+                .Select(msg => msg)
+                .First();
+            if(msg!= null){
+                msg.WasRead = true;
+                return true;
+            }
+            return false;
+        }
+        public bool ReadMail(Message message){
+            var msg = this.Mail.AsQueryable()
+                .Where(msg => msg.MessageId == message.MessageId)
+                .Select(msg => msg)
+                .First();
+            if(msg!= null){
+                msg.WasRead = true;
+                return true;
+            }
+            return false;
+        }
+        public bool AddFriend(string username){
+            if(string.IsNullOrWhiteSpace(username)){
+                var user = Saving.GetUser(username);
+                if(user!=null){
+                this.Friends.Add(username);
+                user.Friends.Add(this.Name);
+                return true;
+                }
+            }
+            return false;
+        }
+        public bool RemoveFriend(string username){
+            if(string.IsNullOrWhiteSpace(username)){
+                Friends.RemoveAll(x=>x==username);
+                User friend = Saving.GetUser(username);
+                if(friend!=null){
+                    friend.Friends.Remove(Name);
                     return true;
                 }
             }
             return false;
         }
-        public bool AddFriend(string username){
-            this.Friends.Add(username);
-            var users = Auth.GetUsers();
-            foreach(var user in users){
-                if(user.Name == username){
-                    user.Friends.Add(this.Name);
+
+        #endregion
+
+        #region overrides
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
+        #endregion
+    }
+
+
+
+    //poco class entity = user
+    public static class Saving{
+        public static string apppath { get; } = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)+@"\Rodrigo's_Stuff\BlackJackCMD\users.db";
+        public static void Update(User user){
+            using(var db = new LiteDatabase(apppath)){
+                var col = db.GetCollection<User>("users");
+                col.EnsureIndex(x => x.Name);
+                col.Update(user);
+            }
+        }
+        public static bool CreateUser(string username){
+            using(var db = new LiteDatabase(apppath)){
+                var col = db.GetCollection<User>("users");
+                var user1 = col.Query().Where(u=>u.Name==username).Select(u=>u).First();
+                if(user1==null){
+                    var user = new User(name: username);
+                    col.Insert(user);
                     return true;
                 }
+                return false;
             }
-            return false;
+        }
+        public static User GetUser(string username){
+            using(var db= new LiteDatabase(apppath)){
+                var col = db.GetCollection<User>("users");
+
+                return  col.Query()
+                            .Where(x => x.Name == username)
+                            .Select(x=>x)
+                            .First();
+                
+            }
+        }
+        public static List<User> GetUsers(){
+            using(var db = new LiteDatabase(apppath)){
+                var col = db.GetCollection<User>("users");
+
+                return col.Query()
+                .Select(user=>user)
+                .ToList();
+            }
         }
     }
 }
